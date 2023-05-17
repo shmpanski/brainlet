@@ -24,4 +24,5 @@ setup(
     extras_require={"dev": dev_packages},
     packages=find_packages(where="src"),
     package_dir={"": "src"},
+    entry_points={"console_scripts": ["brainlet=brainlet.cli:cli"]},
 )
