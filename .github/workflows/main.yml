@@ -26,4 +26,4 @@ jobs:
         run: pytest tests
 
       - name: 'Setup Weaviate'
-        run: docker-compose up -d --wait
+        run: docker-compose up -d
