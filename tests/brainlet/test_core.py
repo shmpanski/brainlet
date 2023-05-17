@@ -10,7 +10,7 @@ WEAVIATE_CLIENT_URL = os.getenv("WEAVIATE_CLIENT_URL", "http://127.0.0.1:8080")
 
 @pytest.fixture(scope="session")
 def weavite_client() -> Client:
-    return Client(WEAVIATE_CLIENT_URL)
+    return Client(WEAVIATE_CLIENT_URL, startup_period=60)
 
 
 @pytest.fixture(scope="function")
