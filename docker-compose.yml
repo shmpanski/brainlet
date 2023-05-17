@@ -35,4 +35,18 @@ services:
     image: semitechnologies/qna-transformers:bert-large-uncased-whole-word-masking-finetuned-squad
     environment:
       ENABLE_CUDA: 0
+
+  brainlet-app:
+    build: .
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - '80'
+    ports:
+      - 80:80
+    depends_on:
+      - weaviate
+    environment:
+      WEAVIATE_CLIENT_URL: 'http://weaviate:8080'
 ...

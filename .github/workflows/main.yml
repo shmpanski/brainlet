@@ -23,7 +23,7 @@ jobs:
         run: mypy src --ignore-missing-imports
 
       - name: 'Setup Weaviate'
-        run: docker-compose up -d
+        run: docker-compose up -d weaviate
 
       - name: 'Unit testing'
         run: pytest tests
