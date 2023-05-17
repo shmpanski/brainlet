@@ -8,7 +8,7 @@ from brainlet.core import ask_question, Answer
 WEAVIATE_CLIENT_URL = os.getenv("WEAVIATE_CLIENT_URL", "http://127.0.0.1:8080")
 
 app = FastAPI()
-client = Client(WEAVIATE_CLIENT_URL)
+client = Client(WEAVIATE_CLIENT_URL, startup_period=60)
 
 
 @app.get("/", response_model_exclude_none=True)
