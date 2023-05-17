@@ -11,6 +11,7 @@ dev_packages = [
     "black~=23.3.0",
     "wikiextractor~=3.0.6",
     "pytest~=7.3.1",
+    "mypy~=1.3.0",
     "httpx~=0.24.0",
 ]
 
