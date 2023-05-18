@@ -49,7 +49,7 @@ brainlet index --source data/enwiki.jsonl --progress
 ```
 
 There is no third step. 
-You can go to https://0.0.0.0/docs (default) and look how the client works.
+You can go to http://0.0.0.0/docs (default) and look how the client works.
 
 ### Under the hood
 
@@ -74,7 +74,7 @@ curl -O --output-dir ./data --create-dirs https://dumps.wikimedia.org/enwiki/lat
 
 # Export wiki dump to json:
 wikiextractor ./data/enwiki-latest-pages-articles-multistream1.xml-p1p41242.bz2 \
-    --json --no-templates -output - \
+    --json --no-templates --output - \
     > ./data/enwiki-latest-pages-articles-multistream1.p1p41242.jsonl
 
 # Preprocess data for suitable format:
@@ -91,6 +91,27 @@ docker-compose up --build
 Create schema and import your data:
 ```shell
 brainlet init && brainlet index --source data/enwiki.jsonl --progress
+```
+
+After a while, you can make a request (it is not necessary to wait for the end of indexing, it is done in the background):
+```shell
+curl -X 'GET' \
+  'http://0.0.0.0/?question=what%20is%20anarchism%3F' \
+  -H 'accept: application/json'
+```
+
+Fortunately, you will get an answer to the question:
+```json
+{
+  "has_answer": true,
+  "source": {
+    "title": "Anarchism",
+    "url": "https://en.wikipedia.org/wiki?curid=12"
+  },
+  "support_text": "Anarchism is a political philosophy and movement that is skeptical of all justifications for authority and seeks to abolish the institutions it claims maintain unnecessary coercion and hierarchy, typically including, though not necessarily limited to, governments, nation states, and capitalism. Anarchism advocates for the replacement of the state with stateless societies or other forms of free associations. As a historically left-wing movement, this reading of anarchism is placed on the farthest left of the political spectrum, it is usually described as the libertarian wing of the socialist movement (libertarian socialism).",
+  "answer": "a political philosophy and movement that is skeptical of all justifications for authority",
+  "certainty": 0.48392624855041505
+}
 ```
 
 ## Testing
