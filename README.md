@@ -15,12 +15,12 @@ pip install .
 
 ## How it works
 The service is based on the [weaviate](https://weaviate.io/) framework.
-The inference of semantic encoders and extractive QA is implemented through weaviate modules [`text2vec-transformers`](https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules/text2vec-transformers) and [`qna-transformers`](https://weaviate.io/developers/weaviate/modules/reader-generator-modules/qna-transformers).
+The inference of semantic encoders and extractive QA is implemented via weaviate modules [`text2vec-transformers`](https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules/text2vec-transformers) and [`qna-transformers`](https://weaviate.io/developers/weaviate/modules/reader-generator-modules/qna-transformers).
 The web service API is implemented using FastAPI.
 
 ### Data
-The service requires some textual knowledge base.
-For the project, we assume that it follows the `jsonl` format:
+The service requires text knowledge base.
+For the project, we assume that it follows the next `jsonl` format:
 ```json
 {
   "url": "https://any-link-to-your-original-knowledge",
@@ -49,14 +49,14 @@ brainlet index --source data/enwiki.jsonl --progress
 ```
 
 There is no third step. 
-You can go to https://0.0.0.0/docs (default) and see how the client works.
+You can go to https://0.0.0.0/docs (default) and look how the client works.
 
 ### Under the hood
 
-Searching for answers based on the textual knowledge base is done in several steps:
-1. Search for the most relevant document from the knowledge base using hybrid search. Hybrid search includes ranking based on BM25 and semantic encoder `mutli-qa-MiniLM-L6`.
+Question Answering based on the text knowledge base is done in several steps:
+1. Search for the most relevant document from the knowledge base using hybrid search. Hybrid search includes ranking based on BM25 and `mutli-qa-MiniLM-L6` semantic encoding.
 2. Find the most relevant paragraph of the document using the same semantic encoder `mutli-qa-MiniLM-L6`.
-3. Use `bert-large-finetuned-squad` to find the spans of the most likely answer.
+3. Use `bert-large-finetuned-squad` to find spans of the most likely answer.
 
 ## end-to-end wikipedia example:
 
@@ -71,10 +71,12 @@ Prepare data:
 ```shell
 # Download dump:
 curl -O --output-dir ./data --create-dirs https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream1.xml-p1p41242.bz2
+
 # Export wiki dump to json:
 wikiextractor ./data/enwiki-latest-pages-articles-multistream1.xml-p1p41242.bz2 \
     --json --no-templates -output - \
     > ./data/enwiki-latest-pages-articles-multistream1.p1p41242.jsonl
+
 # Preprocess data for suitable format:
 python ./scripts/preprocess_wiki_data.py \
    --input ./data/enwiki-latest-pages-articles-multistream1.p1p41242.jsonl \
