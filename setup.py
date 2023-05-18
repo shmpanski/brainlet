@@ -5,6 +5,7 @@ required_packages = [
     "weaviate-client~=3.18.0",
     "fastapi~=0.95.2",
     "uvicorn~=0.22.0",
+    "tqdm~=4.65.0",
 ]
 
 dev_packages = [
