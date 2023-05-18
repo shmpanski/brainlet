@@ -35,17 +35,23 @@ def cli():
     )
     subparsers = parser.add_subparsers(required=True)
 
-    init_parser = subparsers.add_parser("init")
-    init_parser.add_argument("--overwrite", action="store_true")
+    init_parser = subparsers.add_parser("init", help="Initialize index schema")
+    init_parser.add_argument(
+        "--overwrite", action="store_true", help="whether to overwrite existing schema"
+    )
     init_parser.set_defaults(func=init)
 
-    index_parser = subparsers.add_parser("index")
-    index_parser.add_argument("-s", "--source", type=str, required=True)
+    index_parser = subparsers.add_parser(
+        "index", help="Import data and perform indexing"
+    )
+    index_parser.add_argument(
+        "-s", "--source", type=str, required=True, help="Source .jsonl file"
+    )
     index_parser.add_argument("-b", "--batch-size", type=int, default=8)
     index_parser.add_argument("-p", "--progress", action="store_true")
     index_parser.set_defaults(func=index)
 
-    ask_parser = subparsers.add_parser("ask")
+    ask_parser = subparsers.add_parser("ask", help="CLI interface for asking")
     ask_parser.add_argument("question", type=str)
     ask_parser.set_defaults(func=ask)
 

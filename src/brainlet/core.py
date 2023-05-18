@@ -6,6 +6,7 @@ import weaviate
 from tqdm import tqdm
 from weaviate.util import generate_uuid5
 
+# This schema describes data storage, index and ann-search setting.
 DEFAULT_SCHEMA = {
     "classes": [
         {
@@ -91,6 +92,14 @@ def iter_data(jsonl_filename: str) -> Iterator[dict]:
 def create_schema(
     client: weaviate.Client, schema: Optional[dict] = None, overwrite: bool = False
 ):
+    """
+    Create weaviate data schema.
+
+    Args:
+        client: weaviate client.
+        schema: data and index schema. If None, use `DEFAULT_SCHEMA`.
+        overwrite: whether to force overwrite schema if one already exists.
+    """
     if overwrite:
         client.schema.delete_all()
 
@@ -112,6 +121,15 @@ def import_data(
     batch_size: int = 8,
     progress: bool = False,
 ):
+    """
+    Import data into storage and index.
+
+    Args:
+        client: weaviate client.
+        source: source of data. Can be a string path to jsonl file OR iterable of dict with specified format.
+        batch_size: batch size. The most common value with CPU accelerator: batch_size=1.
+        progress: whether to show progress during importing.
+    """
     data = iter_data(source) if isinstance(source, str) else source
 
     if progress:
@@ -156,6 +174,18 @@ class Answer:
 
 
 def ask_question(client: weaviate.Client, question: str) -> Answer:
+    """
+    Ask question.
+
+    Args:
+        client: weaviate client.
+        question: string question.
+
+    Returns: answer object. If answer is found, then :attr:`has_answer` has value `True`.
+
+    """
+
+    # Retrieve most relevant document using hybrid search
     relevant_documents = (
         client.query.get("Document", ["_additional {id}"])
         .with_hybrid(question)
@@ -166,6 +196,7 @@ def ask_question(client: weaviate.Client, question: str) -> Answer:
     if not relevant_documents:
         return Answer(False)
 
+    # Retrive most relevant paragraph and try to extract answer.
     relevant_article_id = relevant_documents[0]["_additional"]["id"]
     requested_properties = [
         "text",
@@ -187,6 +218,7 @@ def ask_question(client: weaviate.Client, question: str) -> Answer:
         .do()
     )
 
+    # Fetch answer result. What a mess... Working with graphql has never been so convenient.
     source_info = response["data"]["Get"]["Paragraph"][0]["inDocument"][0]
     support_text = response["data"]["Get"]["Paragraph"][0]["text"]
     answer = response["data"]["Get"]["Paragraph"][0]["_additional"]["answer"]
