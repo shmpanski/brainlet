@@ -51,7 +51,7 @@ def inference(
 
     for question in questions:
         answer = ask_question(client, question["question"])
-        result[question["id"]] = answer.answer if answer.has_answer else ""
+        result[question["id"]] = answer.answer if answer.answer is not None else ""
 
     with open(output_file, "w") as file:
         json.dump(result, file, ensure_ascii=False)
@@ -103,6 +103,6 @@ def cli():
     inference_parser.set_defaults(func=inference)
 
     args = parser.parse_args()
-    client = weaviate.Client(args.weaviate_client)
+    client = weaviate.Client(args.weaviate_client, startup_period=60)
 
     args.func(client=client, **vars(args))
