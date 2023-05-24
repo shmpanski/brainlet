@@ -184,6 +184,8 @@ def ask_question(client: weaviate.Client, question: str) -> Answer:
     Returns: answer object. If answer is found, then :attr:`has_answer` has value `True`.
 
     """
+    # Escape quotes, unfortunately, weaviate doesn't escape it.
+    question = json.dumps(question).strip('"')
 
     # Retrieve most relevant document using hybrid search
     relevant_documents = (

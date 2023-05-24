@@ -14,6 +14,7 @@ dev_packages = [
     "pytest~=7.3.1",
     "mypy~=1.3.0",
     "httpx~=0.24.0",
+    "numpy~=1.24.3",
 ]
 
 setup(

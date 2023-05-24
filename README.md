@@ -121,3 +121,50 @@ pip install ".[dev]"
 docker-compose up -d weaviate
 pytest tests
 ```
+
+## Evaluation
+
+You can run evaluation on SQuAD-2.0 with following steps: 
+
+```shell
+# Download squad-2.0-dev data
+curl https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v2.0.json --output ./data/squad-2.0-dev.json
+
+# Export knowledge base and list of questions. Use --max-samples in order to evaluate on small part of dataset.
+python ./scripts/preprocess_squad_data.py \
+    --input ./data/squad-2.0-dev.json \
+    --output ./data/squad \
+    --max-samples 1
+
+# Run services
+docker-compose up --build
+
+# Init schema and import knowledge base
+brainlet init && brainlet index --source ./data/squad/knowledge-base.jsonl --progress --batch-size 1
+
+# Find questions and store them into answers file
+brainlet inference --questions-file ./data/squad/questions.jsonl --output-file ./data/squad/answers.jsonl
+
+# Calculate metrics
+python ./scripts/evaluate_squad.py ./data/squad/squad-2.0-dev.json ./data/squad/answers.jsonl
+```
+
+Or just use evaluation script:
+```shell
+ bash scripts/evaluate_squad.bash
+```
+
+Note that resulting scores are much lower than ones from SQuAD benchmark because we perform hybrid search and try to find most relevant SQuAD paragraphs:
+```json
+{
+  "exact": 31.73076923076923,
+  "f1": 35.2142649017649,
+  "total": 208,
+  "HasAns_exact": 43.75,
+  "HasAns_f1": 51.29757395382395,
+  "HasAns_total": 96,
+  "NoAns_exact": 21.428571428571427,
+  "NoAns_f1": 21.428571428571427,
+  "NoAns_total": 112
+}
+```

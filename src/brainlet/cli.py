@@ -1,9 +1,17 @@
 import argparse
+import json
 import sys
+from typing import Iterator
 
 import weaviate
+from tqdm import tqdm
 
 from brainlet.core import create_schema, import_data, ask_question
+
+
+def iter_jsonl(filename: str) -> Iterator[dict]:
+    with open(filename) as file:
+        yield from map(json.loads, file)
 
 
 def init(client: weaviate.Client, overwrite: bool = False, **kwargs):
@@ -26,6 +34,27 @@ def index(
 
 def ask(client: weaviate.Client, question: str, **kwargs):
     print(ask_question(client, question))
+
+
+def inference(
+    client: weaviate.Client,
+    questions_file: str,
+    output_file: str,
+    progress: bool = False,
+    **kwargs
+):
+    questions = iter_jsonl(questions_file)
+    result: dict[str, str] = {}
+
+    if progress:
+        questions = tqdm(list(questions), smoothing=0.0)
+
+    for question in questions:
+        answer = ask_question(client, question["question"])
+        result[question["id"]] = answer.answer if answer.answer is not None else ""
+
+    with open(output_file, "w") as file:
+        json.dump(result, file, ensure_ascii=False)
 
 
 def cli():
@@ -55,7 +84,25 @@ def cli():
     ask_parser.add_argument("question", type=str)
     ask_parser.set_defaults(func=ask)
 
+    inference_parser = subparsers.add_parser(
+        "inference", help="inference for QA squad-2.0-like datasets"
+    )
+    inference_parser.add_argument(
+        "--questions-file",
+        required=True,
+        type=str,
+        help="jsonl file with questions. Each sample have to has `id` and `question` properties",
+    )
+    inference_parser.add_argument(
+        "--output-file",
+        required=True,
+        type=str,
+        help="file to output answers in squad-2.0 format",
+    )
+    inference_parser.add_argument("-p", "--progress", action="store_true")
+    inference_parser.set_defaults(func=inference)
+
     args = parser.parse_args()
-    client = weaviate.Client(args.weaviate_client)
+    client = weaviate.Client(args.weaviate_client, startup_period=60)
 
     args.func(client=client, **vars(args))
