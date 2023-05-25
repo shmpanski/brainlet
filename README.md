@@ -157,14 +157,14 @@ Or just use evaluation script:
 Note that resulting scores are much lower than ones from SQuAD benchmark because we perform hybrid search and try to find most relevant SQuAD paragraphs:
 ```json
 {
-  "exact": 31.73076923076923,
-  "f1": 35.2142649017649,
-  "total": 208,
-  "HasAns_exact": 43.75,
-  "HasAns_f1": 51.29757395382395,
-  "HasAns_total": 96,
-  "NoAns_exact": 21.428571428571427,
-  "NoAns_f1": 21.428571428571427,
-  "NoAns_total": 112
+  "exact": 31.820096016171146,
+  "f1": 35.305567460735034,
+  "total": 11873,
+  "HasAns_exact": 38.25910931174089,
+  "HasAns_f1": 45.240047648668664,
+  "HasAns_total": 5928,
+  "NoAns_exact": 25.399495374264088,
+  "NoAns_f1": 25.399495374264088,
+  "NoAns_total": 5945
 }
 ```
