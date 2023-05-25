@@ -2,7 +2,7 @@
 
 data_directory=${1:-"./data"}
 
-set -x
+set -x -e
 
 # Download dev data
 curl https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v2.0.json --output "${data_directory}"/squad-2.0-dev.json
