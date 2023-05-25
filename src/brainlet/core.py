@@ -185,7 +185,7 @@ def ask_question(client: weaviate.Client, question: str) -> Answer:
 
     """
     # Escape quotes, unfortunately, weaviate doesn't escape it.
-    question = json.dumps(question).strip('"')
+    question = question.replace('"', '\\"')
 
     # Retrieve most relevant document using hybrid search
     relevant_documents = (
